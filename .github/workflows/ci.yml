@@ -1,0 +1,62 @@
+name: CICD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set environment variable
+      run:  echo "TAG=$(date +"%Y.%m.%d.%H.%M.%S")" >> $GITHUB_ENV
+    - name: Set environment variable - OUTPUT
+      run: echo "OUTPUT=sample" >> $GITHUB_ENV
+    - name: Set environment variable - ASSET_NAME
+      run: echo "ASSET_NAME=$(echo "$OUTPUT.pdf")" >> $GITHUB_ENV  
+    - name: Set environment variable - ASSET_PATH
+      run: echo "ASSET_PATH=$(echo "./$ASSET_NAME")" >> $GITHUB_ENV
+    
+    # - name: Test step
+    #   run: |
+    #     echo $TAG
+    #     echo $OUTPUT
+    #     echo $ASSET_NAME
+    #     echo $ASSET_PATH
+
+    - name: Checkout code
+      id: checkout_code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      id: install_dependencies
+      run: ./setup.sh
+
+    - name: Build project
+      id: build_project
+      run: ./build.sh
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.TAG }}
+        release_name: Release ${{ env.TAG }}
+        draft: false
+        prerelease: false
+
+    - name: Upload release asset
+      id: upload_release_asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ${{ env.ASSET_PATH }}
+        asset_name: ${{ env.ASSET_NAME }}
+        asset_content_type: application/pdf
