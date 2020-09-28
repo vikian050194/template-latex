@@ -21,7 +21,7 @@ jobs:
     - name: Set environment variable - TAG
       run: echo ::set-env name=TAG::$(echo $(date +"%Y.%m.%d.%H.%M.%S"))
     - name: Set environment variable - OUTPUT
-      run: echo ::set-env name=OUTPUT::$(echo "blockchain.v$TAG")
+      run: echo ::set-env name=OUTPUT::$(echo "blockchain")
     - name: Set environment variable - ASSET_NAME
       run: echo ::set-env name=ASSET_NAME::$(echo "$OUTPUT.pdf")
     - name: Set environment variable - ASSET_PATH

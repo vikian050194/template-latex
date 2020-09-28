@@ -3,7 +3,7 @@ git clean -fX
 if [ -z $TAG ];
 then
 TAG="$(date +"%Y.%m.%d.%H.%M.%S")";
-OUTPUT="blockchain.v$TAG";
+OUTPUT="blockchain";
 fi
 
 sed -i "s/VERSION/v$TAG/" chapters/cover.tex
